@@ -1,22 +1,33 @@
-const { PDFDocument } = require('pdf-lib');
+const { PDFDocument ,rgb} = require('pdf-lib');
 const { readFile, writeFile } = require('fs/promises');
 
-async function createPdf(input, output) {
+async function fillData(input, output) {
     try {
         
         const pdfData = await readFile(input);
 
         const pdfDoc = await PDFDocument.load(pdfData);
-
-        //modifying the data
+        const form=pdfDoc.getForm();
+        const fields=form.getFields();
         
+        let pdfBytes = await pdfDoc.save();
+        
+        //console.log({fields});
+        fields.forEach(field => {
+            console.log('Field Name:', field.getName());
+            console.log('Field Type:', field.constructor.name);
+        });
+        console.log({fields});
 
-        const pdfBytes = await pdfDoc.save();
+        pdfBytes = await pdfDoc.save();
         await writeFile(output, pdfBytes);
         console.log('PDF Created');
+
     } catch (error) {
         console.error(error);
     }
 }
 
-createPdf('temp.pdf', 'output.pdf');
+fillData('new.pdf', 'output.pdf');
+
+// export default fillData;
